@@ -29,7 +29,7 @@ private:
 
 void readConnections(int m, std::vector<Connection> nodes[]);
 
-int calcMaximumFlow(std::vector<Connection> nodes[], int);
+unsigned long long int calcMaximumFlow(std::vector<Connection> nodes[], int);
 
 void assignFalse(bool array[], int n);
 
@@ -74,8 +74,8 @@ void readConnections(int m, std::vector<Connection> nodes[]) {
  * @param N number of nodes
  * @return max flow
  */
-int calcMaximumFlow(std::vector<Connection> nodes[], int N) {
-    int maxFlow = 0;
+unsigned long long calcMaximumFlow(std::vector<Connection> nodes[], int N) {
+    unsigned long maxFlow = 0;
     while (int inc = findNewPath(nodes, N)) {
         maxFlow += inc;
     }
@@ -95,9 +95,10 @@ int findNewPath(std::vector<Connection> *nodes, int N) {
     std::queue<int> q;
     bool visited[N];
     std::pair<int, int> previousNodes[N]; // previous node in shortest path and min flow
-    previousNodes[0].second = std::numeric_limits<int>::max();
+    previousNodes[0].second = std::numeric_limits<int>::max(); // assign least flow to infinity
     init(q, visited, N);
-    while (!q.empty()) {
+    bool lastNodeFound = false;
+    while (!q.empty() && !lastNodeFound) {
         int currentIndex = q.front();
         q.pop();
         for (auto connection : nodes[currentIndex]) {
@@ -108,10 +109,10 @@ int findNewPath(std::vector<Connection> *nodes, int N) {
             previousNodes[nextIndex].first = currentIndex;
             previousNodes[nextIndex].second = std::min(previousNodes[currentIndex].second, connection.getSpeed());
             visited[nextIndex] = true;
+            if (nextIndex == N - 1) { // if last node
+                lastNodeFound = true;
+            }
             q.push(nextIndex);
-        }
-        if (currentIndex == N) {
-            break;
         }
     }
     int maxFlow = previousNodes[N - 1].second;
