@@ -1,72 +1,86 @@
 #include <iostream>
 #include <vector>
-#include <map>
-
-typedef std::multimap<char, char>::iterator MMAPIterator;
+#include <unordered_map>
+#include <set>
+#include <time.h>
 
 using namespace std;
 
 char lettersCount = 'z' - 'a' + 1;
 
-int getSmallestPos(char *s, int i, multimap<char, char> pairs, vector<int> layers[]) {
-    char c = s[i];
-    int worst = 0;
-    if (layers[c - 'a'].size() != 0) {
-        worst = layers[c - 'a'].back() + 1;
-    }
-    // get all pairs of c.
-    // find worst of this positions
-    pair<MMAPIterator, MMAPIterator> rangeIterators = pairs.equal_range(c);
-    for (MMAPIterator it = rangeIterators.first; it != rangeIterators.second; it++) {
-        char pair = it->second;
-        if (layers[pair - 'a'].size() != 0) {
-            int maybeWorst = layers[pair - 'a'].back() + 1;
-            if (maybeWorst > worst) {
-                worst = maybeWorst;
+void decide(unordered_map<char, set<char>> pairsMap, char s1[1000000], char s2[1000000]);
+
+void printVector(vector<int> vector);
+
+#define SIZE 1000000
+
+void initLayers(vector<int> layers[], char *s, unordered_map<char, set<char>> pairsMap) {
+    for (int i = 0; s[i] != 0 && i < SIZE; i++) {
+        char c = s[i];
+        int smallestPos = 0;
+        if (layers[c - 'a'].size() != 0) {
+            smallestPos = layers[c - 'a'].back() + 1;
+        }
+        for (auto pair : pairsMap[c]) {
+            if (layers[pair - 'a'].size() != 0) {
+                smallestPos = max(layers[pair - 'a'].back() + 1, smallestPos);
             }
         }
+        layers[c - 'a'].push_back(smallestPos);
     }
-    return worst;
-}
-
-void initLayers(vector<int> layers[], char *s, multimap<char, char> pairs) {
-    for (int i = 0; s[i] != 0 && i < 1000000; i++) {
-        layers[s[i] - 'a'].push_back(getSmallestPos(s, i, pairs, layers));
-    }
-}
-
-bool layersEqual(vector<int> layers1[], vector<int> layers2[]) {
-    for (int i = 0; i < lettersCount; i++) {
-        if (layers1[i] != layers2[i]) {
-            return false;
-        }
-    }
-    return true;
 }
 
 int main() {
-    int n;
-    cin >> n;
-    multimap<char, char> pairs;
-    for (int i = 0; i < n; i++) {
-        char c1, c2;
-        cin >> c1 >> c2;
-        pairs.insert({c1, c2});
-        pairs.insert({c2, c1});
+//    int n;
+//    cin >> n;
+//    unordered_map<char, set<char>> pairsMap;
+//    for (int i = 0; i < n; i++) {
+//        char c1, c2;
+//        cin >> c1 >> c2;
+//        pairsMap[c1].insert(c2);
+//        pairsMap[c2].insert(c1);
+//    }
+//    char s1[SIZE], s2[SIZE];
+//    cin.getline(s1, SIZE);
+//    cin.getline(s1, SIZE);
+//    cin.getline(s2, SIZE);
+    srand(time(0));
+    int n = 2;
+    unordered_map<char, set<char>> pairsMap;
+    pairsMap['a'].insert('b');
+    pairsMap['a'].insert('c');
+    pairsMap['b'].insert('a');
+    pairsMap['c'].insert('a');
+    char s1[SIZE];
+    char s2[SIZE];
+    for (int i = 0; i < 10; i++) {
+        s1[i] = rand() % 5 + 'a';
+        s2[i] = rand() % 5 + 'a';
     }
-    char s1[1000000], s2[1000000];
-    cin.getline(s1, 1000000);
-    cin.getline(s1, 1000000);
-    cin.getline(s2, 1000000);
+    s1[10] = 0;
+    s2[10] = 0;
+    cout << s1 << endl;
+    cout << s2 << endl;
+    decide(pairsMap, s1, s2);
+}
+
+void decide(unordered_map<char, set<char>> pairsMap, char s1[1000000], char s2[1000000]) {
     vector<int> layers1[lettersCount];
     vector<int> layers2[lettersCount];
-    initLayers(layers1, s1, pairs);
-    initLayers(layers2, s2, pairs);
-    if (layersEqual(layers1, layers2)) {
-        cout << "YES";
-    } else {
-        cout << "NO";
+    initLayers(layers1, s1, pairsMap);
+    initLayers(layers2, s2, pairsMap);
+    for (int i = 0; i < lettersCount; i++) {
+        cout << (char) 'a' + i << ": ";
+        printVector(layers1[i]);
     }
+    for (int i = 0; i < lettersCount; i++) {
+        if (layers1[i] != layers2[i]) {
+            cout << "NO";
+            return;
+        }
+    }
+    cout << "YES";
+
 }
 
 // 1
@@ -75,3 +89,12 @@ int main() {
 // cddebacc
 
 // NO
+/*
+2
+a b
+a c
+ereeabreac
+reeacberea
+
+ NO
+ */
