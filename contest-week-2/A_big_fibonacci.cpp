@@ -1,17 +1,16 @@
 #include <iostream>
 #include <cmath>
 
-#define big 1000000007
-#define ten9 100000000000
-#define ull unsigned long long
+#define M 1000000007
+#define ull long long
 
 using namespace std;
 
 void multiply(ull m1[2][2], ull m2[2][2]) {
-    ull i00 = (m1[0][0] * m2[0][0] + m1[0][1] * m2[0][1]) % ten9;
-    ull i01 = (m1[0][0] * m2[0][1] + m1[0][1] * m2[1][1]) % ten9;
-    ull i10 = (m1[1][0] * m2[0][0] + m1[1][1] * m2[0][1]) % ten9;
-    ull i11 = (m1[1][0] * m2[0][1] + m1[1][1] * m2[1][1]) % ten9;
+    ull i00 = ((m1[0][0] * m2[0][0]) % M + (m1[0][1] * m2[0][1]) % M) % M;
+    ull i01 = ((m1[0][0] * m2[0][1]) % M + (m1[0][1] * m2[1][1]) % M) % M;
+    ull i10 = ((m1[1][0] * m2[0][0]) % M + (m1[1][1] * m2[0][1]) % M) % M;
+    ull i11 = ((m1[1][0] * m2[0][1]) % M + (m1[1][1] * m2[1][1]) % M) % M;
     m1[0][0] = i00;
     m1[0][1] = i01;
     m1[1][0] = i10;
@@ -71,7 +70,7 @@ void doFib(ull f1, ull f2, ull n) {
     for (ull i = 0; i < rest; i++) {
         multiply(matrix, bm);
     }
-    cout << ((f1 * matrix[0][1]) % big + (f2 * matrix[1][1]) % big) % big;
+    cout << ((f1 * matrix[0][1]) % M + (f2 * matrix[1][1]) % M) % M;
 }
 
 int main() {
